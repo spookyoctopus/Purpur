@@ -5,10 +5,10 @@ Subject: [PATCH] Make GUI Great Again
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 799955b4439ba7739dc011183aad25b39b526566..ceeb42941dd2b4482ee326bbe15c49af8b9027a9 100644
+index 4487138c167b7861406a626ad99b64486eae5aea..c0cc2311f9c9653257be2450f3ff370c383ea16e 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -108,6 +108,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -104,6 +104,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                      return;
                  }
                  // Paper start - Use TerminalConsoleAppender
@@ -17,31 +17,18 @@ index 799955b4439ba7739dc011183aad25b39b526566..ceeb42941dd2b4482ee326bbe15c49af
                  /*
                  jline.console.ConsoleReader bufferedreader = reader;
 diff --git a/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java b/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
-index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe6accbafe 100644
+index c07918aa1ed2469ad7a76a0add60ab648ff7f421..28a21b90663b366fcebb5e416dd9603481040bd7 100644
 --- a/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
 +++ b/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
-@@ -19,7 +19,6 @@ import javax.swing.JList;
- import javax.swing.JPanel;
- import javax.swing.JScrollBar;
- import javax.swing.JScrollPane;
--import javax.swing.JTextArea;
- import javax.swing.JTextField;
- import javax.swing.SwingUtilities;
- import javax.swing.UIManager;
-@@ -30,11 +29,11 @@ import javax.swing.text.BadLocationException;
+@@ -31,6 +31,7 @@ import javax.swing.text.BadLocationException;
  import javax.swing.text.Document;
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.server.dedicated.DedicatedServer;
 +import org.purpurmc.purpur.gui.JColorTextPane;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- // Paper start
- import java.io.IOException;
--import java.util.Objects;
- import javax.imageio.ImageIO;
- // Paper end
+ import org.slf4j.Logger;
  
-@@ -48,6 +47,11 @@ public class MinecraftServerGui extends JComponent {
+ public class MinecraftServerGui extends JComponent {
+@@ -43,6 +44,11 @@ public class MinecraftServerGui extends JComponent {
      private Thread logAppenderThread;
      private final Collection<Runnable> finalizers = Lists.newArrayList();
      final AtomicBoolean isClosing = new AtomicBoolean();
@@ -53,7 +40,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
  
      public static MinecraftServerGui showFrameFor(final DedicatedServer server) {
          try {
-@@ -56,7 +60,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -51,7 +57,7 @@ public class MinecraftServerGui extends JComponent {
              ;
          }
  
@@ -62,7 +49,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
          final MinecraftServerGui servergui = new MinecraftServerGui(server);
  
          jframe.setDefaultCloseOperation(2);
-@@ -64,7 +68,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -59,7 +65,7 @@ public class MinecraftServerGui extends JComponent {
          jframe.pack();
          jframe.setLocationRelativeTo((Component) null);
          jframe.setVisible(true);
@@ -71,7 +58,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
  
          // Paper start - Add logo as frame image
          try {
-@@ -76,7 +80,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -71,7 +77,7 @@ public class MinecraftServerGui extends JComponent {
          jframe.addWindowListener(new WindowAdapter() {
              public void windowClosing(WindowEvent windowevent) {
                  if (!servergui.isClosing.getAndSet(true)) {
@@ -80,7 +67,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
                      server.halt(true);
                      servergui.runFinalizers();
                  }
-@@ -130,7 +134,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -125,7 +131,7 @@ public class MinecraftServerGui extends JComponent {
  
      private JComponent buildChatPanel() {
          JPanel jpanel = new JPanel(new BorderLayout());
@@ -89,7 +76,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
          JScrollPane jscrollpane = new JScrollPane(jtextarea, 22, 30);
  
          jtextarea.setEditable(false);
-@@ -146,6 +150,35 @@ public class MinecraftServerGui extends JComponent {
+@@ -141,6 +147,35 @@ public class MinecraftServerGui extends JComponent {
  
              jtextfield.setText("");
          });
@@ -125,7 +112,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
          jtextarea.addFocusListener(new FocusAdapter() {
              public void focusGained(FocusEvent focusevent) {}
          });
-@@ -181,7 +214,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -176,7 +211,7 @@ public class MinecraftServerGui extends JComponent {
      }
  
      private static final java.util.regex.Pattern ANSI = java.util.regex.Pattern.compile("\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})*)?[m|K]"); // CraftBukkit
@@ -134,7 +121,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
          if (!SwingUtilities.isEventDispatchThread()) {
              SwingUtilities.invokeLater(() -> {
                  this.print(textArea, scrollPane, message);
-@@ -195,11 +228,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -190,11 +225,7 @@ public class MinecraftServerGui extends JComponent {
                  flag = (double) jscrollbar.getValue() + jscrollbar.getSize().getHeight() + (double) (MinecraftServerGui.MONOSPACED.getSize() * 4) > (double) jscrollbar.getMaximum();
              }
  
@@ -147,7 +134,7 @@ index d105b4133a906342a8ee76df3030cef8557fde53..09494194b7da223f1ecb353257f98abe
  
              if (flag) {
                  jscrollbar.setValue(Integer.MAX_VALUE);
-@@ -207,4 +236,16 @@ public class MinecraftServerGui extends JComponent {
+@@ -202,4 +233,16 @@ public class MinecraftServerGui extends JComponent {
  
          }
      }
